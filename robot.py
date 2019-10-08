@@ -1,6 +1,8 @@
 import magicbot
 import wpilib
 import wpilib.drive
+from networktables import NetworkTables
+from networktables import NetworkTablesInstance
 
 import navx
 
@@ -8,13 +10,16 @@ from ctre import WPI_TalonSRX
 
 import robotmap
 
-from components import drivetrain
+from components import drivetrain, limelight
 from oi import DriverStation
 
 class LebotJames(magicbot.MagicRobot):
     subsystem_drivetrain: drivetrain.Drivetrain
+    limelight: limelight.Limelight
 
     def createObjects(self):
+        NetworkTables.initialize()
+
         m_l_a = WPI_TalonSRX(robotmap.port_m_l_a)
         m_l_b = WPI_TalonSRX(robotmap.port_m_l_b)
         m_l_c = WPI_TalonSRX(robotmap.port_m_l_c)
@@ -31,9 +36,12 @@ class LebotJames(magicbot.MagicRobot):
 
         self.oi = DriverStation()
 
+        # self.limelight_table = NetworkTables.getTable("limelight")
+
     def teleopInit(self):
         self.navx.reset()
         self.subsystem_drivetrain.reset()
+        self.limelight.reset()
 
     def teleopPeriodic(self):
         try:
