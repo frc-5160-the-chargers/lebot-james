@@ -23,10 +23,8 @@ class Limelight:
     def execute(self):
         targets = self.limelight_table.getNumber('tv', None)
         self.valid_target = targets >= 1.0 if targets != None else False
-        print(targets)
 
         if self.valid_target:
-            print("asdf")
             self.horizontal_offset = self.limelight_table.getNumber('tx', None)
             self.vertical_offset = self.limelight_table.getNumber('ty', None)
             self.target_area = self.limelight_table.getNumber('ta', None)

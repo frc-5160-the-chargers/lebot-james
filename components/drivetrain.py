@@ -7,10 +7,10 @@ from modes import DrivetrainMode
 from utils import *
 
 class DrivetrainConstants:
-    MAX_POWER = 0.3
-    DEADZONE = 0.05
+    MAX_POWER = 0.5
+    DEADZONE = 0.025
 
-    K_TURNING = 0.05
+    K_TURNING = 0.04
 
 class Drivetrain:
     differential_drivetrain: wpilib.drive.DifferentialDrive
