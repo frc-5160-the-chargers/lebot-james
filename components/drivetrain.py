@@ -2,9 +2,11 @@ import wpilib
 import wpilib.drive
 import ctre
 import navx
+import pathfinder as pf
 
 from modes import DrivetrainMode
 from utils import *
+import trajectories
 
 class DrivetrainConstants:
     MAX_POWER = 0.5
@@ -12,8 +14,18 @@ class DrivetrainConstants:
 
     K_TURNING = 0.04
 
+    WHEEL_DIAMETER = 6
+
+    K_TRAJ_P = 1
+    K_TRAJ_I = 0
+    K_TRAJ_D = 0
+    K_TRAJ_MAX_VEL = 0.5
+    K_TRAJ_TURN = .04
+
 class Drivetrain:
     differential_drivetrain: wpilib.drive.DifferentialDrive
+    encoder_controller_left: ctre.WPI_TalonSRX
+    encoder_controller_right: ctre.WPI_TalonSRX
 
     navx: navx.AHRS
 
@@ -25,10 +37,58 @@ class Drivetrain:
         self.l_power = 0
         self.r_power = 0
 
+        self.left_follower = None
+        self.right_follower = None
+
     def reset(self):
         self.differential_drivetrain.setDeadband(DrivetrainConstants.DEADZONE)
         self.differential_drivetrain.setMaxOutput(DrivetrainConstants.MAX_POWER)
 
+    def reset_encoders(self):
+        self.encoder_controller_left.setQuadraturePosition(0)
+        self.encoder_controller_right.setQuadraturePosition(0)
+
+    def get_positions(self):
+        '''return the position of the left and right side'''
+        return self.encoder_controller_left.getQuadraturePosition(), self.encoder_controller_right.getQuadraturePosition()
+
+    def get_velocities(self):
+        '''return the velocity of the left and right side'''
+        return self.encoder_controller_left.getQuadratureVelocity(), self.encoder_controller_right.getQuadratureVelocity()
+
+    def get_average_position(self):
+        l_p, r_p = self.get_positions()
+        return (l_p+r_p)/2
+
+    def get_average_velocity(self):
+        l_v, r_v = self.get_velocities()
+        return (l_v+r_v)/2
+
+    def set_trajectory(self, trajectory_filename):
+        '''configure the drivetrain to follow a trajectory and load it from a pickle file'''
+        modifier = trajectories.load_trajectory(trajectory_filename)
+        left_follower, right_follower = trajectories.get_tank_trajectory_data(modifier)
+        configure_follower = lambda follower, encoder: follower.configureEncoder(encoder.getQuadraturePosition(), 4096, DrivetrainConstants.WHEEL_DIAMETER)
+        map(configure_follower, [left_follower, right_follower])
+        pidva = lambda follower: follower.configurePIDVA(DrivetrainConstants.K_TRAJ_P, DrivetrainConstants.K_TRAJ_I, DrivetrainConstants.K_TRAJ_D, 1 / DrivetrainConstants.K_TRAJ_MAX_VEL, 0)
+        map(pidva, [left_follower, right_follower])
+
+        self.left_follower = left_follower
+        self.right_follower = right_follower
+
+    def trajectory_drive(self):
+        l_enc_pos, r_enc_pos = self.get_positions()
+        left_output = self.left_follower.calculate(l_enc_pos)
+        right_output = self.right_follower.calculate(r_enc_pos)
+
+        heading = self.navx.getAngle()
+        target_heading = pf.r2d(self.left_follower.getHeading())
+
+        heading_error = pf.boundHalfDegrees(target_heading - heading)
+        turn = DrivetrainConstants.K_TRAJ_TURN * heading_error
+        self.differential_drivetrain.tankDrive(left_output - turn, right_output + turn)
+        print(f"{left_output - turn}, {right_output + turn}")
+        
     def tank_drive(self, left_power, right_power):
         self.drive_mode = DrivetrainMode.MANUAL_DRIVE_TANK
         self.l_power = left_power
@@ -66,3 +126,6 @@ class Drivetrain:
 
         if self.drive_mode == DrivetrainMode.MANUAL_DRIVE_TANK:
             self.differential_drivetrain.tankDrive(self.l_power, self.r_power)
+
+        if self.drive_mode == DrivetrainMode.TRAJECTORY_FOLLOW:
+            self.trajectory_drive()

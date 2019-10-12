@@ -8,3 +8,5 @@ class DrivetrainMode(enum.Enum):
     MANUAL_DRIVE_ARCADE = enum.auto()
 
     ASSIST_DRIVE_ARCADE = enum.auto()
+
+    TRAJECTORY_FOLLOW = enum.auto()

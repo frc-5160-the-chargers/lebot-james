@@ -4,7 +4,7 @@ from networktables import NetworkTables
 
 import math
 
-class Limelight:    
+class Limelight:
     def __init__(self):
         self.reset()
         self.limelight_table = NetworkTables.getTable("limelight")

@@ -1,5 +1,9 @@
 # robotics specific stuff
 .deploy_cfg
+*.pickle
+.installer_config
+pip_cache/
+opkg_cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -25,19 +25,19 @@ class LebotJames(magicbot.MagicRobot):
         m_l_b = WPI_TalonSRX(robotmap.port_m_l_b)
         m_l_c = WPI_TalonSRX(robotmap.port_m_l_c)
         self.left_motors = wpilib.SpeedControllerGroup(m_l_a, m_l_b, m_l_c)
+        self.encoder_controller_left = m_l_a
 
         m_r_a = WPI_TalonSRX(robotmap.port_m_r_a)
         m_r_b = WPI_TalonSRX(robotmap.port_m_r_b)
         m_r_c = WPI_TalonSRX(robotmap.port_m_r_c)
         self.right_motors = wpilib.SpeedControllerGroup(m_r_a, m_r_b, m_r_c)
+        self.encoder_controller_right = m_r_a
 
         self.differential_drivetrain = wpilib.drive.DifferentialDrive(self.left_motors, self.right_motors)
 
         self.navx = navx.AHRS.create_spi()
 
         self.oi = DriverStation()
-
-        # self.limelight_table = NetworkTables.getTable("limelight")
 
     def teleopInit(self):
         self.navx.reset()
