@@ -2,15 +2,32 @@ import networktables
 
 from networktables import NetworkTables
 
+import math
+
 class Limelight:    
     def __init__(self):
         self.reset()
         self.limelight_table = NetworkTables.getTable("limelight")
 
-    def get_angle_offset(self):
+    def get_horizontal_angle_offset(self):
         '''return the angle needed to turn to make the target in the center of view'''
         if self.valid_target:
             return self.horizontal_offset
+        else:
+            return 0
+
+    def get_vertical_angle_offset(self):
+        if self.valid_target:
+            return self.vertical_offset
+        else:
+            return 0
+
+    def get_distance_trig(self, camera_height, target_height):
+        target_angle = self.vertical_offset
+        tan_angle = math.tan(math.radians(target_angle))
+        height_difference = target_height-camera_height
+        if tan_angle != 0:
+            return height_difference/tan_angle
         else:
             return 0
 

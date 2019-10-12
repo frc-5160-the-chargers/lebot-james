@@ -3,6 +3,7 @@ import wpilib
 import wpilib.drive
 from networktables import NetworkTables
 from networktables import NetworkTablesInstance
+from wpilib import SmartDashboard as dash
 
 import navx
 
@@ -54,6 +55,10 @@ class LebotJames(magicbot.MagicRobot):
                 self.subsystem_drivetrain.drive_to_angle(self.oi.controller_driver.getY()**3)
             elif self.subsystem_drivetrain.drive_mode == drivetrain.DrivetrainMode.ASSIST_DRIVE_ARCADE:
                 self.subsystem_drivetrain.drive_mode = drivetrain.DrivetrainMode.MANUAL_DRIVE_CURVATURE
+
+            dash.putString("distance to target", self.limelight.get_distance_trig(31, 51))
+            dash.putString("horizontal angle to target", self.limelight.get_horizontal_angle_offset())
+            dash.putString("vertical angle to target", self.limelight.get_vertical_angle_offset())
         except:
             self.onException()
 

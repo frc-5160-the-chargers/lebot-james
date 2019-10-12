@@ -16,5 +16,5 @@ class LimelightFollowAuto:
         self.subsystem_drivetrain.arcade_drive(0, 0)
 
     def on_iteration(self, time_elapsed):
-        limelight_displacement = self.limelight.get_angle_offset()
+        limelight_displacement = self.limelight.get_horizontal_angle_offset()
         self.subsystem_drivetrain.arcade_drive(0, -limelight_displacement*DrivetrainConstants.K_TURNING)
