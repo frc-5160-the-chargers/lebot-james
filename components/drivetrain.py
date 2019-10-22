@@ -22,6 +22,10 @@ class DrivetrainConstants:
     K_TRAJ_MAX_VEL = 0.5
     K_TRAJ_TURN = .04
 
+    K_TURN_P = 0
+    K_TURN_I = 0
+    K_TURN_D = 0
+
 class Drivetrain:
     differential_drivetrain: wpilib.drive.DifferentialDrive
     encoder_controller_left: ctre.WPI_TalonSRX
@@ -114,6 +118,30 @@ class Drivetrain:
         self.x_power = power
         self.z_rotation = curvature
 
+    def turn_to_angle(self, angle, tolerance=1):
+        if self.drive_mode != DrivetrainMode.TURN_TO_ANGLE:        
+            self.turn_pid = wpilib.PIDController(
+                DrivetrainConstants.K_TURN_P,
+                DrivetrainConstants.K_TURN_I,
+                DrivetrainConstants.K_TURN_D,
+                lambda: self.navx.getAngle(),
+                lambda x: self.differential_drivetrain.arcadeDrive(0, x)
+            )
+            self.turn_pid.setAbsoluteTolerance(tolerance)
+            self.drive_mode = DrivetrainMode.TURN_TO_ANGLE
+            self.turn_pid.reset()
+            self.turn_pid.enable()
+        self.turn_pid.setSetpoint(angle)
+
+    def stop_turning_to_angle(self):
+        self.turn_pid.disable()
+        self.drive_mode = DrivetrainMode.MANUAL_DRIVE_CURVATURE
+
+    def is_done_turning(self):
+        if self.drive_mode != DrivetrainMode.TURN_TO_ANGLE:
+            return False
+        return self.turn_pid.onTarget()
+        
     def execute(self):
         if self.drive_mode == DrivetrainMode.ASSIST_DRIVE_ARCADE:
             self.differential_drivetrain.arcadeDrive(self.x_power, self.z_rotation)
@@ -129,3 +157,6 @@ class Drivetrain:
 
         if self.drive_mode == DrivetrainMode.TRAJECTORY_FOLLOW:
             self.trajectory_drive()
+
+        if self.drive_mode == DrivetrainMode.TURN_TO_ANGLE:
+            pass

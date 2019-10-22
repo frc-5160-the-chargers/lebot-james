@@ -10,3 +10,5 @@ class DrivetrainMode(enum.Enum):
     ASSIST_DRIVE_ARCADE = enum.auto()
 
     TRAJECTORY_FOLLOW = enum.auto()
+
+    TURN_TO_ANGLE = enum.auto()
