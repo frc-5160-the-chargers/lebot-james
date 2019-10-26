@@ -2,7 +2,6 @@ import wpilib
 import wpilib.drive
 import ctre
 import navx
-import pathfinder as pf
 
 from modes import DrivetrainMode
 from utils import *
@@ -41,10 +40,12 @@ class Drivetrain:
             lambda: self.navx.getAngle(),
             lambda x: self.differential_drivetrain.arcadeDrive(0, x)
         )
+        self.turn_pid.setOutputRange(-1, 1)
 
     def reset(self):
         self.differential_drivetrain.setDeadband(DrivetrainConstants.DEADZONE)
         self.differential_drivetrain.setMaxOutput(DrivetrainConstants.MAX_POWER)
+        self.turn_pid.disable()
 
     def reset_encoders(self):
         self.encoder_controller_left.setQuadraturePosition(0)
