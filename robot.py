@@ -10,6 +10,7 @@ import navx
 from ctre import WPI_TalonSRX
 
 import robotmap
+import dashboard_utils
 
 from components import drivetrain, limelight
 from oi import DriverStation
@@ -38,6 +39,13 @@ class LebotJames(magicbot.MagicRobot):
         self.navx = navx.AHRS.create_spi()
 
         self.oi = DriverStation()
+
+        dashboard_utils.put_pid_values(
+            "drivetrain_turn",
+            kP=drivetrain.DrivetrainConstants.K_TURN_P,
+            kI=drivetrain.DrivetrainConstants.K_TURN_I, 
+            kD=drivetrain.DrivetrainConstants.K_TURN_D
+        )
 
     def teleopInit(self):
         self.navx.reset()

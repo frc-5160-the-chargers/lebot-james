@@ -6,7 +6,6 @@ import pathfinder as pf
 
 from modes import DrivetrainMode
 from utils import *
-import trajectories
 
 class DrivetrainConstants:
     MAX_POWER = 0.5
@@ -15,12 +14,6 @@ class DrivetrainConstants:
     K_TURNING = 0.04
 
     WHEEL_DIAMETER = 6
-
-    K_TRAJ_P = 1
-    K_TRAJ_I = 0
-    K_TRAJ_D = 0
-    K_TRAJ_MAX_VEL = 0.5
-    K_TRAJ_TURN = .04
 
     K_TURN_P = 0
     K_TURN_I = 0
@@ -41,8 +34,13 @@ class Drivetrain:
         self.l_power = 0
         self.r_power = 0
 
-        self.left_follower = None
-        self.right_follower = None
+        self.turn_pid = wpilib.PIDController(
+            DrivetrainConstants.K_TURN_P,
+            DrivetrainConstants.K_TURN_I,
+            DrivetrainConstants.K_TURN_D,
+            lambda: self.navx.getAngle(),
+            lambda x: self.differential_drivetrain.arcadeDrive(0, x)
+        )
 
     def reset(self):
         self.differential_drivetrain.setDeadband(DrivetrainConstants.DEADZONE)
@@ -68,30 +66,8 @@ class Drivetrain:
         l_v, r_v = self.get_velocities()
         return (l_v+r_v)/2
 
-    def set_trajectory(self, trajectory_filename):
-        '''configure the drivetrain to follow a trajectory and load it from a pickle file'''
-        modifier = trajectories.load_trajectory(trajectory_filename)
-        left_follower, right_follower = trajectories.get_tank_trajectory_data(modifier)
-        configure_follower = lambda follower, encoder: follower.configureEncoder(encoder.getQuadraturePosition(), 4096, DrivetrainConstants.WHEEL_DIAMETER)
-        map(configure_follower, [left_follower, right_follower])
-        pidva = lambda follower: follower.configurePIDVA(DrivetrainConstants.K_TRAJ_P, DrivetrainConstants.K_TRAJ_I, DrivetrainConstants.K_TRAJ_D, 1 / DrivetrainConstants.K_TRAJ_MAX_VEL, 0)
-        map(pidva, [left_follower, right_follower])
-
-        self.left_follower = left_follower
-        self.right_follower = right_follower
-
-    def trajectory_drive(self):
-        l_enc_pos, r_enc_pos = self.get_positions()
-        left_output = self.left_follower.calculate(l_enc_pos)
-        right_output = self.right_follower.calculate(r_enc_pos)
-
-        heading = self.navx.getAngle()
-        target_heading = pf.r2d(self.left_follower.getHeading())
-
-        heading_error = pf.boundHalfDegrees(target_heading - heading)
-        turn = DrivetrainConstants.K_TRAJ_TURN * heading_error
-        self.differential_drivetrain.tankDrive(left_output - turn, right_output + turn)
-        print(f"{left_output - turn}, {right_output + turn}")
+    def update_pid(self, kP=0, kI=0, kD=0):
+        self.turn_pid.setPID(kP, kI, kD)
         
     def tank_drive(self, left_power, right_power):
         self.drive_mode = DrivetrainMode.MANUAL_DRIVE_TANK
@@ -119,14 +95,7 @@ class Drivetrain:
         self.z_rotation = curvature
 
     def turn_to_angle(self, angle, tolerance=1):
-        if self.drive_mode != DrivetrainMode.TURN_TO_ANGLE:        
-            self.turn_pid = wpilib.PIDController(
-                DrivetrainConstants.K_TURN_P,
-                DrivetrainConstants.K_TURN_I,
-                DrivetrainConstants.K_TURN_D,
-                lambda: self.navx.getAngle(),
-                lambda x: self.differential_drivetrain.arcadeDrive(0, x)
-            )
+        if self.drive_mode != DrivetrainMode.TURN_TO_ANGLE:
             self.turn_pid.setAbsoluteTolerance(tolerance)
             self.drive_mode = DrivetrainMode.TURN_TO_ANGLE
             self.turn_pid.reset()
@@ -141,7 +110,7 @@ class Drivetrain:
         if self.drive_mode != DrivetrainMode.TURN_TO_ANGLE:
             return False
         return self.turn_pid.onTarget()
-        
+    
     def execute(self):
         if self.drive_mode == DrivetrainMode.ASSIST_DRIVE_ARCADE:
             self.differential_drivetrain.arcadeDrive(self.x_power, self.z_rotation)
@@ -154,9 +123,6 @@ class Drivetrain:
 
         if self.drive_mode == DrivetrainMode.MANUAL_DRIVE_TANK:
             self.differential_drivetrain.tankDrive(self.l_power, self.r_power)
-
-        if self.drive_mode == DrivetrainMode.TRAJECTORY_FOLLOW:
-            self.trajectory_drive()
 
         if self.drive_mode == DrivetrainMode.TURN_TO_ANGLE:
             pass
