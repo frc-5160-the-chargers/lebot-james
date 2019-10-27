@@ -4,6 +4,10 @@ from networktables import NetworkTables
 
 import math
 
+class LimelightConstants:
+    MOUNTING_HEIGHT = 31 # inches
+    TARGET_HEIGHT = 51 # inches
+
 class Limelight:
     def __init__(self):
         self.reset()
@@ -22,7 +26,7 @@ class Limelight:
         else:
             return 0
 
-    def get_distance_trig(self, camera_height, target_height):
+    def get_distance_trig(self, camera_height=LimelightConstants.MOUNTING_HEIGHT, target_height=LimelightConstants.TARGET_HEIGHT):
         target_angle = self.vertical_offset
         tan_angle = math.tan(math.radians(target_angle))
         height_difference = target_height-camera_height
