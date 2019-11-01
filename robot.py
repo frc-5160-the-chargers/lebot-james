@@ -8,12 +8,12 @@ from wpilib import SmartDashboard as dash
 import navx
 
 from ctre import WPI_TalonSRX
-from rev import CANSparkMax, MotorType
 
 import robotmap
 import dashboard_utils
 
-from components import drivetrain, limelight, shooter
+from components import drivetrain, limelight, shooter, loader
+from modes import *
 from oi import DriverStation
 
 class LebotJames(magicbot.MagicRobot):
@@ -22,6 +22,9 @@ class LebotJames(magicbot.MagicRobot):
 
     if robotmap.shooter_enabled:
         subsystem_shooter: shooter.Shooter
+
+    if robotmap.loader_enabled:
+        subsystem_loader: loader.Loader
 
     if robotmap.limelight_enabled:
         limelight: limelight.Limelight
@@ -45,7 +48,10 @@ class LebotJames(magicbot.MagicRobot):
             self.differential_drivetrain = wpilib.drive.DifferentialDrive(self.left_motors, self.right_motors)
 
         if robotmap.shooter_enabled:
-            self.shooter_motor = CANSparkMax(robotmap.port_m_shooter, MotorType.kBrushless)
+            self.shooter_motor = WPI_TalonSRX(robotmap.port_m_shooter)
+
+        if robotmap.loader_enabled:
+            self.loader_motor = WPI_TalonSRX(robotmap.port_m_loader)
 
         if robotmap.navx_enabled:
             self.navx = navx.AHRS.create_spi()
@@ -96,7 +102,15 @@ class LebotJames(magicbot.MagicRobot):
                 else:
                     self.subsystem_shooter.disable()
 
-                dash.putNumber("shooter speed error", self.subsystem_shooter.speed_controller_pid.getError())
+                dash.putNumber("shooter speed error", self.subsystem_shooter.get_error())
+
+            if robotmap.loader_enabled:
+                if self.oi.controller_sysop.getPOV() == 0: # up on dpad
+                    self.subsystem_loader.position = LoaderPosition.UP
+                if self.oi.controller_sysop.getPOV() == 180: # down on dpad
+                    self.subsystem_loader.position = LoaderPosition.DOWN
+                if self.oi.controller_sysop.getXButtonPressed():
+                    self.subsystem_loader.enabled = not self.subsystem_loader.enabled
         except:
             self.onException()
 

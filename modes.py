@@ -12,3 +12,7 @@ class DrivetrainMode(enum.Enum):
     TRAJECTORY_FOLLOW = enum.auto()
 
     TURN_TO_ANGLE = enum.auto()
+
+class LoaderPosition(enum.Enum):
+    UP = enum.auto()
+    DOWN = enum.auto()
