@@ -1,5 +1,5 @@
 drivetrain_enabled = True
-shooter_enabled = True
+shooter_enabled = False
 loader_enabled = False
 
 limelight_enabled = True
@@ -19,5 +19,5 @@ port_m_loader = 8
 dashboard_pid_drivetrain_turn = "drivetrain_turn"
 
 auto_targetting_alignment_tolerance = 1.5
-auto_targetting_max_distance = 10
-auto_targetting_min_distance = 3
+auto_targetting_max_distance = 3
+auto_targetting_min_distance = 1

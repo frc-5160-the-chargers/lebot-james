@@ -3,7 +3,7 @@ from components.limelight import *
 
 class LimelightFollowAuto:
     MODE_NAME = "Limelight Following"
-    DEFAULT = False
+    DEFAULT = True
 
     subsystem_drivetrain: Drivetrain
     limelight: Limelight

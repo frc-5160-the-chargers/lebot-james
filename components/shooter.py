@@ -14,11 +14,11 @@ class ShooterConstants:
     K_I = 0
     K_D = 0
 
-    SHOOTER_DIAMETER = 4
+    SHOOTER_DIAMETER = 0.102
 
     # TODO ensure that these are correct
-    SHOOTER_HEIGHT = 30
-    TARGET_HEIGHT = 30
+    SHOOTER_HEIGHT = 1.17
+    TARGET_HEIGHT = .47
 
     K_RAD_S_POWER = 0.2 # radians per second per 100% power
 
@@ -70,6 +70,8 @@ class Shooter:
         if ShooterConstants.PID_ENABLED:
             self.speed_controller_pid.enable()
             self.set_speed(speed)
+        else:
+            self.set_motors(speed)
         self.enabled = True
     
     def disable(self):

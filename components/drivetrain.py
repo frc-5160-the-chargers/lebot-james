@@ -13,7 +13,7 @@ class DrivetrainConstants:
     K_PROPORTIONAL_TURNING = 0.04
     K_PROPORTIONAL_DRIVING = 0.05
 
-    WHEEL_DIAMETER = 6
+    WHEEL_DIAMETER = 0.15
 
     K_TURN_P = 0
     K_TURN_I = 0

@@ -45,7 +45,7 @@ def calculate_shot_vector(starting_position=(0, 0), target_position=(0, 0), shoo
         if Y < math.tan(rad_angle) * X:
             return ((0, 0), shooting_angle, target_angle, -1, False)
 
-        v_y = math.sqrt(((X ** 2) * g * math.tan(rad_angle)) / ((-2 * Y) + (2 * X * math.tan(rad_angle))))
+        v_y = math.sqrt(((X ** 2) * g * math.tan(rad_angle) ** 2) / ((-2 * Y) + (2 * X * math.tan(rad_angle))))
         v_x = v_y / math.tan(rad_angle)
 
     time_of_intercept = X / v_x

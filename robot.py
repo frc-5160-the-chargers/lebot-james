@@ -89,8 +89,6 @@ class LebotJames(magicbot.MagicRobot):
                         self.subsystem_drivetrain.curvature_drive(self.oi.controller_driver.getY()**3, -self.oi.controller_driver.getX()**3)
                     if self.subsystem_drivetrain.drive_mode == drivetrain.DrivetrainMode.MANUAL_DRIVE_ARCADE:
                         self.subsystem_drivetrain.arcade_drive(self.oi.controller_driver.getY()**3, -self.oi.controller_driver.getX()**3)
-                    if self.subsystem_drivetrain.drive_mode == drivetrain.DrivetrainMode.MANUAL_DRIVE_TANK:
-                        self.subsystem_drivetrain.tank_drive(self.oi.controller_driver.getY(wpilib.XboxController.Hand.kLeft)**3, self.oi.controller_driver.getY()**3)
                     
                     if self.navx.isConnected() and self.oi.check_drivetrain_straight(self.oi.controller_driver.getX(), self.oi.controller_driver.getY()):
                         self.subsystem_drivetrain.drive_to_angle(self.oi.controller_driver.getY()**3)
@@ -102,18 +100,18 @@ class LebotJames(magicbot.MagicRobot):
                     shooter_enabled = dash.getBoolean("shooter enabled", False)
 
                     if shooter_enabled:
-                        self.subsystem_shooter.enable_at_speed(target_shooter_speed)
+                        self.subsystem_shooter.enable_at_speed(self.oi.controller_driver.getY(wpilib.XboxController.Hand.kLeft))
                     else:
                         self.subsystem_shooter.disable()
 
                     dash.putNumber("shooter speed error", self.subsystem_shooter.get_error())
             
                 if robotmap.loader_enabled:
-                    if self.oi.controller_sysop.getPOV() == 0: # up on dpad
+                    if self.oi.controller_driver.getPOV() == 0: # up on dpad
                         self.subsystem_loader.position = LoaderPosition.UP
-                    if self.oi.controller_sysop.getPOV() == 180: # down on dpad
+                    if self.oi.controller_driver.getPOV() == 180: # down on dpad
                         self.subsystem_loader.position = LoaderPosition.DOWN
-                    if self.oi.controller_sysop.getXButtonPressed():
+                    if self.oi.controller_driver.getXButtonPressed():
                         self.subsystem_loader.enabled = not self.subsystem_loader.enabled
 
                 if self.oi.controller_driver.getBButtonPressed():
@@ -156,7 +154,7 @@ class LebotJames(magicbot.MagicRobot):
                     drivetrain_rotation = drivetrain.DrivetrainConstants.K_PROPORTIONAL_TURNING*angular_error
                     drivetrain_power = drivetrain.DrivetrainConstants.K_PROPORTIONAL_DRIVING*distance_error
 
-                    self.subsystem_drivetrain.arcade_drive(drivetrain_power, drivetrain_rotation)
+                    self.subsystem_drivetrain.arcade_drive(-drivetrain_power, drivetrain_rotation)
 
                 if robotmap.shooter_enabled:
                     # set the shooter to an appropriate speed if the drivetrain is on target
@@ -174,7 +172,7 @@ class LebotJames(magicbot.MagicRobot):
                     self.robot_mode = RobotModes.MANUAL_DRIVE
 
             if robotmap.limelight_enabled:
-                dash.putString("distance to target", self.limelight.get_distance_trig(31, 51))
+                dash.putString("distance to target", self.limelight.get_distance_trig())
                 dash.putString("horizontal angle to target", self.limelight.get_horizontal_angle_offset())
                 dash.putString("vertical angle to target", self.limelight.get_vertical_angle_offset())
 

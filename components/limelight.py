@@ -5,8 +5,8 @@ from networktables import NetworkTables
 import math
 
 class LimelightConstants:
-    MOUNTING_HEIGHT = 31 # inches
-    TARGET_HEIGHT = 51 # inches
+    MOUNTING_HEIGHT = 0.80 # meters
+    TARGET_HEIGHT = 0.70 # meters
 
 class Limelight:
     def __init__(self):
