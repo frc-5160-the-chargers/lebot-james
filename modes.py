@@ -13,6 +13,13 @@ class DrivetrainMode(enum.Enum):
 
     TURN_TO_ANGLE = enum.auto()
 
+    PROPORTIONAL_ANGLE_HOLDING = enum.auto()
+
 class LoaderPosition(enum.Enum):
     UP = enum.auto()
     DOWN = enum.auto()
+
+class RobotModes(enum.Enum):
+    MANUAL_DRIVE = enum.auto()
+
+    AUTO_TARGETTING = enum.auto()

@@ -10,7 +10,8 @@ class DrivetrainConstants:
     MAX_POWER = 0.5
     DEADZONE = 0.025
 
-    K_TURNING = 0.04
+    K_PROPORTIONAL_TURNING = 0.04
+    K_PROPORTIONAL_DRIVING = 0.05
 
     WHEEL_DIAMETER = 6
 
@@ -82,7 +83,7 @@ class Drivetrain:
         self.x_power = power
 
         rotation_error = self.navx.getAngle() - angle
-        raw_rotation = rotation_error * DrivetrainConstants.K_TURNING
+        raw_rotation = rotation_error * DrivetrainConstants.K_PROPORTIONAL_TURNING
         self.z_rotation = math.copysign(abs(raw_rotation)**.5, raw_rotation)
 
     def arcade_drive(self, power, rotation):
@@ -111,7 +112,7 @@ class Drivetrain:
         if self.drive_mode != DrivetrainMode.TURN_TO_ANGLE:
             return False
         return self.turn_pid.onTarget()
-    
+ 
     def execute(self):
         if self.drive_mode == DrivetrainMode.ASSIST_DRIVE_ARCADE:
             self.differential_drivetrain.arcadeDrive(self.x_power, self.z_rotation)
