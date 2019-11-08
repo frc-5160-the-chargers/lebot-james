@@ -6,7 +6,8 @@ import math
 
 class LimelightConstants:
     MOUNTING_HEIGHT = 0.80 # meters
-    TARGET_HEIGHT = 0.70 # meters
+    TARGET_HEIGHT = 0.49 # meters
+    ANGLE_OFFSET = 10 # degrees
 
 class Limelight:
     def __init__(self):
@@ -26,8 +27,8 @@ class Limelight:
         else:
             return 0
 
-    def get_distance_trig(self, camera_height=LimelightConstants.MOUNTING_HEIGHT, target_height=LimelightConstants.TARGET_HEIGHT):
-        target_angle = self.vertical_offset
+    def get_distance_trig(self, camera_height=LimelightConstants.MOUNTING_HEIGHT, target_height=LimelightConstants.TARGET_HEIGHT, angle_offset=LimelightConstants.ANGLE_OFFSET):
+        target_angle = self.vertical_offset + angle_offset
         tan_angle = math.tan(math.radians(target_angle))
         height_difference = target_height-camera_height
         if tan_angle != 0:

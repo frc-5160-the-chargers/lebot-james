@@ -154,7 +154,7 @@ class LebotJames(magicbot.MagicRobot):
                     drivetrain_rotation = drivetrain.DrivetrainConstants.K_PROPORTIONAL_TURNING*angular_error
                     drivetrain_power = drivetrain.DrivetrainConstants.K_PROPORTIONAL_DRIVING*distance_error
 
-                    self.subsystem_drivetrain.arcade_drive(-drivetrain_power, drivetrain_rotation)
+                    self.subsystem_drivetrain.arcade_drive(drivetrain_power, drivetrain_rotation)
 
                 if robotmap.shooter_enabled:
                     # set the shooter to an appropriate speed if the drivetrain is on target
