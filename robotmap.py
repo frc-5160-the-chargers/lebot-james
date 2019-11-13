@@ -19,5 +19,5 @@ port_m_loader = 8
 dashboard_pid_drivetrain_turn = "drivetrain_turn"
 
 auto_targetting_alignment_tolerance = 1.5
-auto_targetting_max_distance = 1.5
-auto_targetting_min_distance = 1
+auto_targetting_max_distance = 1
+auto_targetting_min_distance = .5

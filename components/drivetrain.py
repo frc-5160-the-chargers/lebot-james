@@ -11,13 +11,14 @@ class DrivetrainConstants:
     DEADZONE = 0.025
 
     K_PROPORTIONAL_TURNING = 0.04
-    K_PROPORTIONAL_DRIVING = 0.05
+    K_PROPORTIONAL_DRIVING = 0.25
 
     WHEEL_DIAMETER = 0.15
 
-    K_TURN_P = 0
-    K_TURN_I = 0
-    K_TURN_D = 0
+    # TODO: these values were tuned on 12-Nov-19 so they should be checked later for accuracy
+    K_TURN_P = 0.255
+    K_TURN_I = 0.002
+    K_TURN_D = 0.55
 
 class Drivetrain:
     differential_drivetrain: wpilib.drive.DifferentialDrive
@@ -39,12 +40,12 @@ class Drivetrain:
             DrivetrainConstants.K_TURN_I,
             DrivetrainConstants.K_TURN_D,
             lambda: self.navx.getAngle(),
-            lambda x: self.differential_drivetrain.arcadeDrive(0, x)
+            lambda x: self.differential_drivetrain.tankDrive(-x, x, squareInputs=False)
         )
         self.turn_pid.setOutputRange(-1, 1)
-
+    
     def reset(self):
-        self.differential_drivetrain.setDeadband(DrivetrainConstants.DEADZONE)
+        self.differential_drivetrain.setDeadband(0) # we shouldn't do deabands on the controllers
         self.differential_drivetrain.setMaxOutput(DrivetrainConstants.MAX_POWER)
         self.turn_pid.disable()
 
@@ -79,12 +80,11 @@ class Drivetrain:
     def drive_to_angle(self, power, angle=0):
         if self.drive_mode != DrivetrainMode.ASSIST_DRIVE_ARCADE:
             self.drive_mode = DrivetrainMode.ASSIST_DRIVE_ARCADE
+            self.turn_pid.setSetpoint(angle)
+            self.turn_pid.enable() # TODO add a cooresponding disable somewhere
             self.navx.reset()
         self.x_power = power
-
-        rotation_error = self.navx.getAngle() - angle
-        raw_rotation = rotation_error * DrivetrainConstants.K_PROPORTIONAL_TURNING
-        self.z_rotation = math.copysign(abs(raw_rotation)**.5, raw_rotation)
+        self.z_rotation = self.turn_pid.get()
 
     def arcade_drive(self, power, rotation):
         self.drive_mode = DrivetrainMode.MANUAL_DRIVE_ARCADE

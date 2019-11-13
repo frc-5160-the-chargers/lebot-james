@@ -30,4 +30,10 @@ class LimelightFollowAuto:
         turn_kP, turn_kI, turn_kD = dashboard_utils.get_pid_values(robotmap.dashboard_pid_drivetrain_turn)
         self.subsystem_drivetrain.update_pid(turn_kP, turn_kI, turn_kD)
 
+        dash.putNumber("total error", self.subsystem_drivetrain.turn_pid.totalError)
+        dash.putNumber("integral term", self.subsystem_drivetrain.turn_pid.I * self.subsystem_drivetrain.turn_pid.totalError)
+        dash.putNumber("current angle", self.subsystem_drivetrain.navx.getAngle())
+
+        dash.putNumber("PID Output", self.subsystem_drivetrain.turn_pid.get())
+
         self.subsystem_drivetrain.turn_to_angle(dash.getNumber("Turn Position", 0))

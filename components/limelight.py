@@ -6,7 +6,7 @@ import math
 
 class LimelightConstants:
     MOUNTING_HEIGHT = 0.80 # meters
-    TARGET_HEIGHT = 0.49 # meters
+    TARGET_HEIGHT = 1.30 # meters
     ANGLE_OFFSET = 10 # degrees
 
 class Limelight:

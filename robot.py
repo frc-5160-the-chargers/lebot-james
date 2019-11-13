@@ -176,6 +176,8 @@ class LebotJames(magicbot.MagicRobot):
                 dash.putString("horizontal angle to target", self.limelight.get_horizontal_angle_offset())
                 dash.putString("vertical angle to target", self.limelight.get_vertical_angle_offset())
 
+            dash.putNumber("PID Output", self.subsystem_drivetrain.turn_pid.get())
+
         except:
             self.onException()
 
