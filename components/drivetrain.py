@@ -40,7 +40,7 @@ class Drivetrain:
             DrivetrainConstants.K_TURN_I,
             DrivetrainConstants.K_TURN_D,
             lambda: self.navx.getAngle(),
-            lambda x: self.differential_drivetrain.tankDrive(-x, x, squareInputs=False)
+            lambda x: x # self.differential_drivetrain.tankDrive(-x, x, squareInputs=False)
         )
         self.turn_pid.setOutputRange(-1, 1)
     
@@ -81,10 +81,11 @@ class Drivetrain:
         if self.drive_mode != DrivetrainMode.ASSIST_DRIVE_ARCADE:
             self.drive_mode = DrivetrainMode.ASSIST_DRIVE_ARCADE
             self.turn_pid.setSetpoint(angle)
+            self.turn_pid.reset()
             self.turn_pid.enable() # TODO add a cooresponding disable somewhere
             self.navx.reset()
         self.x_power = power
-        self.z_rotation = self.turn_pid.get()
+        self.z_rotation = -self.turn_pid.get()
 
     def arcade_drive(self, power, rotation):
         self.drive_mode = DrivetrainMode.MANUAL_DRIVE_ARCADE

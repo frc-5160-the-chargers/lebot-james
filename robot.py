@@ -181,5 +181,8 @@ class LebotJames(magicbot.MagicRobot):
         except:
             self.onException()
 
+def git_gud(robot):
+    wpilib.run(robot)
+
 if __name__ == '__main__':
-    wpilib.run(LebotJames)
+    git_gud(LebotJames)
